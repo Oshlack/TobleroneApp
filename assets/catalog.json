@@ -1,0 +1,16 @@
+[
+    {
+        "Gene": "IKZF1",
+        "ReferenceCoordinates": {
+            "hg38": "chr7:50304716-50405101",
+            "hg19": "chr7:50343720-50472799"
+        },
+        "Cohorts": [
+            {
+                "ID": "ball",
+                "Name": "B-ALL RCH Cohort",
+                "Source": "ikzf1_ball_rch.csv"
+            }
+        ]
+    }
+]

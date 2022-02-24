@@ -1,0 +1,6 @@
+Gene,Deletion,Colour,Threshold,Label
+IKZF1,del4_5_6_7,#81B622,0,Undetected
+IKZF1,del4_5_6_7,#db24a1,0.001,Low confidence
+IKZF1,del4_5_6_7,#ffa500,0.01,Medium confidence
+IKZF1,del4_5_6_7,#800080,0.1,High confidence
+IKZF1,*,#777777,-1,No reference
