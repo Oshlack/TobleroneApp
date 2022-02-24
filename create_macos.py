@@ -1,3 +1,5 @@
+#!/bin/env python3 
+
 """
 Usage:
 	python3 create-macOS-app.py py2app
