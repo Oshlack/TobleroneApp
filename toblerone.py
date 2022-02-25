@@ -260,7 +260,7 @@ class Api:
 			else:
 				print("Platform: linux")
 
-				local_binary = "./bin/osx/tinyt_amd64"
+				local_binary = "./bin/linux/tinyt_amd64"
 
 			# files[0][1] = fastq, files[1][1] = bam and files[2][1] = bai file
 			calls = subprocess.run([local_binary,"map","-i","./assets/ikzf1.idx",files[0][1]], capture_output=True, text=True)
