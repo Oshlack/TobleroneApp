@@ -249,23 +249,25 @@ class Api:
 		try:
 
 			local_platform = platform.system()
+			script_path = os.path.dirname(os.path.realpath(__file__))
+			os.path.dirname(os.path.realpath(__file__))
 
 			if local_platform == "Darwin":
 				print("Platform: macos")
-				local_binary  = "./bin/osx/tinyt_macos"
+				local_binary  = os.path.join(script_path,"bin/osx/tinyt_macos")
 			elif local_platform == "Windows":
 				print("Platform: win")
 
-				local_binary = "./bin/win/tinyt.exe"
+				local_binary = os.path.join(script_path,"bin/win/tinyt.exe")
 			else:
 				print("Platform: linux")
-
-				local_binary = "./bin/linux/tinyt_amd64"
+				#print(os.path.dirname(os.path.realpath(__file__)))	
+				local_binary = os.path.join(script_path, "bin/linux/tinyt_amd64")
 
 			# files[0][1] = fastq, files[1][1] = bam and files[2][1] = bai file
-			calls = subprocess.run([local_binary,"map","-i","./assets/ikzf1.idx",files[0][1]], capture_output=True, text=True)
+			calls = subprocess.run([local_binary,"map","-i",os.path.join(script_path,"assets/ikzf1.idx"),files[0][1]], capture_output=True, text=True)
 			calls.check_returncode()
-
+			#print(calls.stdout)
 		except subprocess.CalledProcessError as e:
 			print("Error calling tinyt")
 			print(e)
