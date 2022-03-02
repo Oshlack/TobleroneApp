@@ -57,6 +57,6 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
-            ./dist/Toblerone
+            ./dist/Toblerone.app
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
