@@ -50,7 +50,7 @@ jobs:
            pip install -r requirements.txt
       
       - name: Build for mac
-        run: python3 create_macos.py py2app && chmod +x ./dist/Toblerone 
+        run: python3 create_macos.py py2app && chmod +x ./dist/Toblerone.app 
 
       - name: Release
         uses: softprops/action-gh-release@v1
