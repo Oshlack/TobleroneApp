@@ -17,8 +17,13 @@ jobs:
           default: true
           override: true
 
+  - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
       - name: Build
-        run: sudo ./create_linux.bash && chmod +x ./dist/Toblerone
+        run: sudo ./create_linux.bash && sudo chmod +x ./dist/Toblerone
 
       - name: Release
         uses: softprops/action-gh-release@v1
