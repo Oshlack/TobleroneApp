@@ -67,13 +67,11 @@ jobs:
         run: |
             cd ./dist/ 
             create-dmg 'Toblerone.app'
-            if [ $? -eq 2 ]; then
-                 echo "Passed with code signing error"
-                 cp Toberone*dmg Toblerone.dmg 
-            else
-                 echo "Some other error in create-dmg"
-                 rm Toberone*dmg
-            fi
+
+      - name: Rename dmg
+        run: |
+            echo "Previous step should passed with code signing error, exit(2)"
+            cd ./dist/ && cp Toberone*dmg Toblerone.dmg 
       
       - name: Release
         uses: softprops/action-gh-release@v1
