@@ -44,7 +44,7 @@ jobs:
         with:
           node-version: '14'
 
-      - Install create-dmg
+      - name: Install create-dmg
         run: |
            npm install --global create-dmg
            npm test 
