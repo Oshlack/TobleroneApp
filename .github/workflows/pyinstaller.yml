@@ -71,7 +71,7 @@ jobs:
       - name: Rename dmg
         run: |
             echo "Previous step should passed with code signing error, exit(2)"
-            cd ./dist/ && cp Toberone*dmg Toblerone.dmg 
+            cd ./dist/ && cp Toblerone*dmg Toblerone.dmg 
       
       - name: Release
         uses: softprops/action-gh-release@v1
