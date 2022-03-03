@@ -46,6 +46,7 @@ jobs:
 
       - name: Install create-dmg
         run: |
+           touch package.json
            npm install --global create-dmg
            npm test 
 
