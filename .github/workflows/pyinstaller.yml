@@ -48,7 +48,6 @@ jobs:
         run: |
            npm init -y
            npm install --global create-dmg
-           npm test 
 
       - name: Install dependency env
         uses: actions/setup-python@v2
