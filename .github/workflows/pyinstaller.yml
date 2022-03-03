@@ -63,7 +63,15 @@ jobs:
         run: python3 create_macos.py py2app && chmod +x ./dist/Toblerone.app 
 
       - name: Build dmg
-        run: cd ./dist/ && create-dmg 'Toblerone.app' && cp Toberone*dmg Toblerone.dmg 
+        run: |
+            cd ./dist/ && create-dmg 'Toblerone.app'
+            if [ $? -eq 2 ]; then
+                 echo "Passed with code signing error"
+                 cp Toberone*dmg Toblerone.dmg 
+            else
+                 echo "Some other error in create-dmg"
+                 exit 1
+            fi
       
       - name: Release
         uses: softprops/action-gh-release@v1
