@@ -46,8 +46,7 @@ jobs:
 
       - name: Install create-dmg
         run: |
-           touch package.json
-           npm install --global create-dmg
+           npm install --no-save  --global create-dmg
            npm test 
 
       - name: Install dependency env
