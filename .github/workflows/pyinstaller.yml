@@ -46,7 +46,8 @@ jobs:
 
       - name: Install create-dmg
         run: |
-           npm install --no-save  --global create-dmg
+           npm init -y
+           npm install --global create-dmg
            npm test 
 
       - name: Install dependency env
