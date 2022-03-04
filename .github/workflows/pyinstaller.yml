@@ -23,7 +23,7 @@ jobs:
            pip install -r requirements.txt
 
       - name: Build
-        run: sudo ./create_linux.bash && sudo chmod +x ./dist/Toblerone && sudo mv  ./dist/Toblerone ./dist/Toblerone_linux 
+        run: sudo ./create_linux.bash && sudo chmod +x ./dist/Toblerone && sudo mv  ./dist/Toblerone ./dist/Toblerone_linux && sudo chmod +x ./dist/Toblerone_linux 
 
       - name: Release
         uses: softprops/action-gh-release@v1
