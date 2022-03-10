@@ -12,9 +12,12 @@ This desktop app is available for single sample analysis.
 
 
 ### Download
-        <a href="https://github.com/pages-themes/cayman" class="btn">View on GitHub</a>
-        <a href="https://github.com/pages-themes/cayman/zipball/master" class="btn">Download .zip</a>
-        <a href="https://github.com/pages-themes/cayman/tarball/master" class="btn">Download .tar.gz</a>
+
+The latest binary release is available below:
+
+- macOS - https://github.com/Oshlack/TobleroneApp/releases/latest/download/Toblerone.dmg
+- Linux - https://github.com/Oshlack/TobleroneApp/releases/latest/download/Toblerone_linux
+- Windows 10/11 (via WSL) - https://github.com/Oshlack/TobleroneApp/releases/latest/download/Toblerone_linux
 
 
 ### Compile
