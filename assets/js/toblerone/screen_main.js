@@ -29,6 +29,7 @@ function updateMainSelection(res) {
 
 function fillConfigurationValues(conf) {
 	$("#config_DeleteTempFiles").prop("checked", conf["DeleteTempFiles"]);
+	$("#config_TwoPass").prop("checked", conf["TwoPass"]);
 }
 
  
@@ -122,9 +123,11 @@ $("#gene").change(function() {
 // If settings are saved then send them to backend and close the settings section
 $("#btn_save_settings").click(function() {
 	let del_temp_files_val = $("#config_DeleteTempFiles").is(":checked")
+	let twopass_val = $("#config_TwoPass").is(":checked")
 
 	let new_conf = {
-		"DeleteTempFiles": del_temp_files_val
+		"DeleteTempFiles": del_temp_files_val,
+		"TwoPass": twopass_val
 	}
 	
 	pywebview.api.updateConfiguration(new_conf).then(function() {

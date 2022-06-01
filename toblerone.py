@@ -6,6 +6,7 @@ import tempfile
 import pysam
 import regex
 import platform
+from collections import defaultdict
 
 script_path = os.path.dirname(os.path.realpath(__file__))
 catalog = ''
@@ -115,7 +116,7 @@ class Api:
 		return file_path
 
 
-	def extractReads(self, file, gene_id, genome_name, tmpbam, tmpfastq):
+	def extractReads(self, file, gene_id, genome_name, tmpbam, tmpfastq, tmpfastq_r2):
 		"""Extract out reads from a BAM file and convert them to FASTQ
 
 		Args:
@@ -124,6 +125,8 @@ class Api:
 			genome_name (str): Genome_
 			tmpbam (str): File path for temprary BAM (extracted reads)
 			tmpfastq (str): File path of temporary FASTQ (extracted reads)
+			tmpfastq_r2 (str): File path of temporary FASTQ R2 reads if found (extracted reads)
+
 
 		Returns:
 			_type_: _description_
@@ -136,17 +139,80 @@ class Api:
 
 		# Extract out reads and save to temporary output file
 		fastq_reads = []
+		fastq_reads_r2 = []
 
+		# first pass get all reads in region, and if pairs found write to fastq files
+		read_dict = defaultdict(lambda: [None, None])
+
+
+		# if pairs are found in region, write to fastq at same time
 		for read in input_file.fetch(chrom, int(start), int(end)):
 			output_file.write(read)
+			
+			if not read.is_proper_pair or read.is_secondary or read.is_supplementary:
+				continue
+			qname = read.query_name
+			if qname not in read_dict:
+					if read.is_read1:
+						read_dict[qname][0] = read
+					else:
+						read_dict[qname][1] = read
+			else:
+					if read.is_read1:
+						#ikzf1reads.write(read)
+						#ikzf1reads.write(read_dict[qname][1])
+						fastq_reads.append("@%s\n%s\n+\n%s\n" % (read.query_name, read.query_sequence, "".join(map(lambda x: chr( x+33 ), read.query_qualities)))) # Reads in FASTQ format, convert numeric qualities to chr
+						fastq_reads_r2.append("@%s\n%s\n+\n%s\n" % (read_dict[qname][1].query_name, read_dict[qname][1].query_sequence, "".join(map(lambda x: chr( x+33 ), read_dict[qname][1].query_qualities)))) # Reads in FASTQ format, convert numeric qualities to chr
 
-			fastq_reads.append("@%s\n%s\n+\n%s\n" % (read.query_name, read.query_sequence, "".join(map(lambda x: chr( x+33 ), read.query_qualities)))) # Reads in FASTQ format, convert numeric qualities to chr
+					else:
+						#ikzf1reads.write(read_dict[qname][0])
+						#ikzf1reads.write(read)
+						fastq_reads.append("@%s\n%s\n+\n%s\n" % (read_dict[qname][0].query_name, read_dict[qname][0].query_sequence, "".join(map(lambda x: chr( x+33 ), read_dict[qname][0].query_qualities)))) # Reads in FASTQ format, convert numeric qualities to chr
+						fastq_reads_r2.append("@%s\n%s\n+\n%s\n" % (read.query_name, read.query_sequence, "".join(map(lambda x: chr( x+33 ), read.query_qualities)))) # Reads in FASTQ format, convert numeric qualities to chr
+
+					del read_dict[qname]
+
+		print("Dict length remaining is",len(read_dict))
+
+
+		# second pass to pick up stray pairs
+		if config['Dynamic']['TwoPass']:
+			for read in input_file.fetch(until_eof=True):
+				if read.is_unmapped:
+					print ("read is unmapped")
+				if not read.is_proper_pair or read.is_secondary or read.is_supplementary:
+						continue
+				qname = read.query_name
+				if qname in read_dict: # could be missing pair
+					if read.is_read1 and read_dict[qname][0] == None  :
+						fastq_reads.append("@%s\n%s\n+\n%s\n" % (read.query_name, read.query_sequence, "".join(map(lambda x: chr( x+33 ), read.query_qualities)))) # Reads in FASTQ format, convert numeric qualities to chr
+						fastq_reads_r2.append("@%s\n%s\n+\n%s\n" % (read_dict[qname][1].query_name, read_dict[qname][1].query_sequence, "".join(map(lambda x: chr( x+33 ), read_dict[qname][1].query_qualities)))) # Reads in FASTQ format, convert numeric qualities to chr
+
+						del read_dict[qname]
+					elif read.is_read2 and read_dict[qname][1] == None :
+						fastq_reads.append("@%s\n%s\n+\n%s\n" % (read_dict[qname][0].query_name, read_dict[qname][0].query_sequence, "".join(map(lambda x: chr( x+33 ), read_dict[qname][0].query_qualities)))) # Reads in FASTQ format, convert numeric qualities to chr
+						fastq_reads_r2.append("@%s\n%s\n+\n%s\n" % (read.query_name, read.query_sequence, "".join(map(lambda x: chr( x+33 ), read.query_qualities)))) # Reads in FASTQ format, convert numeric qualities to chr
+
+						del read_dict[qname]
+			print("2nd pass, Dict length remaining is",len(read_dict))
+
+			# if read.is_paired:
+			# 	if read.is_read1:
+			# 		fastq_reads.append("@%s\n%s\n+\n%s\n" % (read.query_name, read.query_sequence, "".join(map(lambda x: chr( x+33 ), read.query_qualities)))) # Reads in FASTQ format, convert numeric qualities to chr
+			# 	elif read.is_read2: 
+			# 		fastq_reads_r2.append("@%s\n%s\n+\n%s\n" % (read.query_name, read.query_sequence, "".join(map(lambda x: chr( x+33 ), read.query_qualities)))) # Reads in FASTQ format, convert numeric qualities to chr
+
+			# else:
+			# 	fastq_reads.append("@%s\n%s\n+\n%s\n" % (read.query_name, read.query_sequence, "".join(map(lambda x: chr( x+33 ), read.query_qualities)))) # Reads in FASTQ format, convert numeric qualities to chr
 
 		# Write FASTQ file
 		with open(tmpfastq, "w") as fastq_out:
 			for r in fastq_reads:
 				fastq_out.write(r)
 
+		with open(tmpfastq_r2, "w") as fastq_out_r2:
+				for r in fastq_reads_r2:
+					fastq_out_r2.write(r)
 
 		input_file.close()
 		output_file.close()
@@ -177,6 +243,7 @@ class Api:
 		tmp_bam = tempfile.NamedTemporaryFile(suffix = '.bam').name
 		tmp_bai = None
 		tmp_fastq = tempfile.NamedTemporaryFile(suffix = '.fastq').name
+		tmp_fastq_r2 = tempfile.NamedTemporaryFile(suffix = '.fastq').name
 
 		try:
 			# Check if the file index (.bai) exists. If not then return an error
@@ -184,7 +251,7 @@ class Api:
 				tinytHasError, tinyt_stderr, tinyt_output = True, "Error", "The selected BAM file is not indexed."
 
 			if not tinytHasError:
-				self.extractReads(bamfile, gene_id, genome_name, tmp_bam, tmp_fastq)
+				self.extractReads(bamfile, gene_id, genome_name, tmp_bam, tmp_fastq, tmp_fastq_r2)
 
 				# Check the generated BAM file. If size less than 10 KB then it does not contain any reads and return an error.
 				bam_file_size = os.stat(tmp_bam).st_size / 1024 # Generated BAM file size in kilobytes
@@ -200,6 +267,7 @@ class Api:
 				content_bai = open(tmp_bai, 'rb')
 
 				files = [('file', tmp_fastq),
+						('file', tmp_fastq_r2),
 						 ('file', content_bam), 
 						 ('file', content_bai)]
 				
@@ -221,12 +289,15 @@ class Api:
 		finally:
 			if config['Dynamic']['DeleteTempFiles']:
 				os.remove(tmp_fastq)
+				os.remove(tmp_fastq_r2)
+
 				os.remove(tmp_bam)
 				os.remove(tmp_bai)
 				print("Temporary files deleted")
 			else:
 				print("The following temporary files were not deleted:")
 				print(tmp_fastq)
+				print(tmp_fastq_r2)
 				print(tmp_bam)
 				print(tmp_bai)
 
@@ -264,10 +335,21 @@ class Api:
 				#print(os.path.dirname(os.path.realpath(__file__)))	
 				local_binary = os.path.join(script_path, "bin/linux/tinyt_amd64")
 
-			# files[0][1] = fastq, files[1][1] = bam and files[2][1] = bai file
-			calls = subprocess.run([local_binary,"map","-i",os.path.join(script_path,"assets/ikzf1.idx"),files[0][1]], capture_output=True, text=True)
-			calls.check_returncode()
-			#print(calls.stdout)
+			# check if we found paired end by size of r2 file
+			# files[0][1] = fastq, files[1][1] = fastq_r2, ,files[2][1] = bam and files[3][1] = bai file
+
+			if (os.stat(files[1][1]).st_size == 0):
+				print("Single end reads call to tinyt")
+
+				calls = subprocess.run([local_binary,"map","-i",os.path.join(script_path,"assets/ikzf1.idx"),files[0][1]], capture_output=True, text=True)
+				calls.check_returncode()
+			else:
+				#paired reads
+				print("Paired end reads call to tinyt")
+
+				calls = subprocess.run([local_binary,"map","-i",os.path.join(script_path,"assets/ikzf1.idx"),files[0][1],files[1][1]], capture_output=True, text=True)
+				calls.check_returncode()
+				#print(calls.stdout)
 		except subprocess.CalledProcessError as e:
 			print("Error calling tinyt")
 			print(e)

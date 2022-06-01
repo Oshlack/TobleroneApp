@@ -1,3 +1,5 @@
 {
-    "DeleteTempFiles": true
+    "DeleteTempFiles": false,
+    "TwoPass": true
+
 }
