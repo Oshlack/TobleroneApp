@@ -172,29 +172,107 @@ class Api:
 
 					del read_dict[qname]
 
-		print("Dict length remaining is",len(read_dict))
+
+		unmapped_pairs = 0
+		pair_locations = set()
+		print("Inspecting dictionary...")
+
+		print("Dict length remaining after first pass is",len(read_dict))
+		for key,(r1,r2) in read_dict.items():
+						#print("Read key is",key)
+						if not r1: 
+							#print("Read is R2 located on: ",r2.reference_name)
+							#print(r2.reference_id)
+							#print("Pair is R1 with id: ",r2.next_reference_id)
+							#print("Pair is R1 located on: ",r2.next_reference_name)
+							#print(r2.next_reference_id)
+							#print(r2.next_reference_name)
+							#print(r2.next_reference_start)
+							if (r2.mate_is_unmapped):
+								unmapped_pairs = unmapped_pairs+1
+							else:
+								pair_locations.add(r2.next_reference_name)
+
+							#for read_2nd in  pysam.AlignmentFile(file, 'rb').fetch(r2.next_reference_name, r2.next_reference_start):
+							#print(r2.mate())
+							#	if key == r2.reference:
+							#		print(read_2nd) 
+
+						else:
+							#print("Read is R1 located on: ",r1.reference_name)
+							#print("Pair is R2 located on: ",r1.next_reference_name)
+							
+
+							if (r1.mate_is_unmapped):
+								unmapped_pairs = unmapped_pairs+1
+							else:
+								pair_locations.add(r1.next_reference_name)
+							
+							# print(r1.reference_id)
+							# print(r1.next_reference_id)
+							# print(r1.next_reference_name)
+							# print(r1.next_reference_start)
+							# print(r1.mate_is_unmapped)
+							#print(r1.mate())
+ 
+		print("Dict items with unmapped pairs",unmapped_pairs)
+		print("Dict items pair locations",pair_locations)
+		print("Rechecking all of chrom for pairs...")
+
+		# co-ordinate may have been wrong, or different chromsome - check each chr again with mate in original region
+		for contig in pair_locations:
+			for read in input_file.fetch(contig):
+							if read.is_unmapped:
+								print ("read is unmapped")
+							if not read.is_proper_pair or read.is_secondary or read.is_supplementary:
+									continue
+							qname = read.query_name
+							if qname in read_dict: # could be missing pair
+								if read.is_read1 and read_dict[qname][0] == None  :
+									fastq_reads.append("@%s\n%s\n+\n%s\n" % (read.query_name, read.query_sequence, "".join(map(lambda x: chr( x+33 ), read.query_qualities)))) # Reads in FASTQ format, convert numeric qualities to chr
+									fastq_reads_r2.append("@%s\n%s\n+\n%s\n" % (read_dict[qname][1].query_name, read_dict[qname][1].query_sequence, "".join(map(lambda x: chr( x+33 ), read_dict[qname][1].query_qualities)))) # Reads in FASTQ format, convert numeric qualities to chr
+
+									del read_dict[qname]
+								elif read.is_read2 and read_dict[qname][1] == None :
+									fastq_reads.append("@%s\n%s\n+\n%s\n" % (read_dict[qname][0].query_name, read_dict[qname][0].query_sequence, "".join(map(lambda x: chr( x+33 ), read_dict[qname][0].query_qualities)))) # Reads in FASTQ format, convert numeric qualities to chr
+									fastq_reads_r2.append("@%s\n%s\n+\n%s\n" % (read.query_name, read.query_sequence, "".join(map(lambda x: chr( x+33 ), read.query_qualities)))) # Reads in FASTQ format, convert numeric qualities to chr
+
+									del read_dict[qname]
 
 
-		# second pass to pick up stray pairs
-		if config['Dynamic']['TwoPass']:
-			for read in input_file.fetch(until_eof=True):
-				if read.is_unmapped:
-					print ("read is unmapped")
-				if not read.is_proper_pair or read.is_secondary or read.is_supplementary:
-						continue
-				qname = read.query_name
-				if qname in read_dict: # could be missing pair
-					if read.is_read1 and read_dict[qname][0] == None  :
-						fastq_reads.append("@%s\n%s\n+\n%s\n" % (read.query_name, read.query_sequence, "".join(map(lambda x: chr( x+33 ), read.query_qualities)))) # Reads in FASTQ format, convert numeric qualities to chr
-						fastq_reads_r2.append("@%s\n%s\n+\n%s\n" % (read_dict[qname][1].query_name, read_dict[qname][1].query_sequence, "".join(map(lambda x: chr( x+33 ), read_dict[qname][1].query_qualities)))) # Reads in FASTQ format, convert numeric qualities to chr
+		# TODO can we exit these loops if dic is empty? i.e have found all stray pairs
+        # Only if there are unmapped pairs *and* it is enabled, do we carry on until EOF for unmapped
+		print("after chr re-check pass, dict length remaining is",len(read_dict))
+		if len(read_dict) > 0:
+			print("Unmapped reads pairs found",len(read_dict))
+			if config['Dynamic']['TwoPass']:
 
-						del read_dict[qname]
-					elif read.is_read2 and read_dict[qname][1] == None :
-						fastq_reads.append("@%s\n%s\n+\n%s\n" % (read_dict[qname][0].query_name, read_dict[qname][0].query_sequence, "".join(map(lambda x: chr( x+33 ), read_dict[qname][0].query_qualities)))) # Reads in FASTQ format, convert numeric qualities to chr
-						fastq_reads_r2.append("@%s\n%s\n+\n%s\n" % (read.query_name, read.query_sequence, "".join(map(lambda x: chr( x+33 ), read.query_qualities)))) # Reads in FASTQ format, convert numeric qualities to chr
+				for read in input_file.fetch(until_eof=True):
+					if read.is_unmapped:
+						print ("read is unmapped")
+					if not read.is_proper_pair or read.is_secondary or read.is_supplementary:
+							continue
+					qname = read.query_name
+					if qname in read_dict: # could be missing pair
+						if read.is_read1 and read_dict[qname][0] == None  :
+							fastq_reads.append("@%s\n%s\n+\n%s\n" % (read.query_name, read.query_sequence, "".join(map(lambda x: chr( x+33 ), read.query_qualities)))) # Reads in FASTQ format, convert numeric qualities to chr
+							fastq_reads_r2.append("@%s\n%s\n+\n%s\n" % (read_dict[qname][1].query_name, read_dict[qname][1].query_sequence, "".join(map(lambda x: chr( x+33 ), read_dict[qname][1].query_qualities)))) # Reads in FASTQ format, convert numeric qualities to chr
 
-						del read_dict[qname]
-			print("2nd pass, Dict length remaining is",len(read_dict))
+							del read_dict[qname]
+						elif read.is_read2 and read_dict[qname][1] == None :
+							fastq_reads.append("@%s\n%s\n+\n%s\n" % (read_dict[qname][0].query_name, read_dict[qname][0].query_sequence, "".join(map(lambda x: chr( x+33 ), read_dict[qname][0].query_qualities)))) # Reads in FASTQ format, convert numeric qualities to chr
+							fastq_reads_r2.append("@%s\n%s\n+\n%s\n" % (read.query_name, read.query_sequence, "".join(map(lambda x: chr( x+33 ), read.query_qualities)))) # Reads in FASTQ format, convert numeric qualities to chr
+
+							del read_dict[qname]
+				print("3rd pass, Dict length remaining is",len(read_dict))
+				if len(read_dict) > 0:
+					print("Reads not matched:",len(read_dict))
+			else:
+				print("Unmapped reads not enabled in config.")
+
+
+		else:
+			print("Skipping unmapped check")
 
 			# if read.is_paired:
 			# 	if read.is_read1:
