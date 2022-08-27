@@ -12,5 +12,25 @@
                 "Source": "IKZF1_ball_rch.csv"
             }
         ]
+    }, 
+
+  {
+        "Gene": "CD22",
+        "ReferenceCoordinates": {
+            "hg38": "chr19:35329187-35347361",
+            "hg19": "chr19:35810164-35838258"
+        },
+        "Cohorts": [
+            {
+                "ID": "ball",
+                "Name": "B-ALL RCH Cohort",
+                "Source": "IKZF1_ball_rch.csv"
+            }
+        ]
     }
+
+
+
+
+
 ]

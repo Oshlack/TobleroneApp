@@ -7,6 +7,8 @@ import pysam
 import regex
 import platform
 from collections import defaultdict
+import argparse
+import sys
 
 script_path = os.path.dirname(os.path.realpath(__file__))
 catalog = ''
@@ -546,11 +548,40 @@ class Api:
 
 
 if __name__ == '__main__':
-	"""Starts the app with GUI
+	"""Starts the app with GUI unless command line options given
 	"""
 
-	api = Api()
-	catalog = api.readCatalogue() # Load catalogue
-	config['Dynamic'] = api.readConfigurationFile() # Load dynamic configuration
-	window = webview.create_window('Toblerone', 'assets/gui.html', js_api = api, width = 1000, height = 712, resizable = False) # Create GUI window
-	webview.start(debug=True)
+	if len(sys.argv) > 1:
+
+		parser = argparse.ArgumentParser(description='TobleroneApp command line options.')
+
+		#command line mode - extract reads or open gui as per normal
+		parser.add_argument("-e","--extract", action='store_true')
+		parser.add_argument('-i','--index', type=argparse.FileType('r'), nargs="?", default="./assets/ikzf1.idx")
+		parser.add_argument('-g','--gene', default="IKZF1")
+		parser.add_argument('-r','--reference', default="hg38")
+		parser.add_argument('-b','--bam', type=argparse.FileType('r'), required=True)
+		parser.add_argument('-1','--read1',  default=tempfile.NamedTemporaryFile(suffix = '.fastq').name)
+		parser.add_argument('-2','--read2',  default=tempfile.NamedTemporaryFile(suffix = '.fastq').name)
+	
+		args = parser.parse_args()
+		with args.index as index,args.bam as bam:
+		# Create temporary BAM and FASTQ files which will contain extracted out reads
+			tmp_bam = tempfile.NamedTemporaryFile(suffix = '.bam').name
+			tmp_bai = None
+			tmp_fastq = args.read1
+			tmp_fastq_r2 = args.read2
+
+			print(index.name)
+			print(bam.name)
+			print(args.gene)
+			api = Api()
+			catalog = api.readCatalogue() # Load catalogue
+			extract_result = api.extractReads(bam.name, args.gene, args.reference, tmp_bam, tmp_fastq, tmp_fastq_r2)
+			print(tmp_fastq, tmp_fastq_r2)
+			print(extract_result)
+	else:
+		api = Api()
+		config['Dynamic'] = api.readConfigurationFile() # Load dynamic configuration
+		window = webview.create_window('Toblerone', 'assets/gui.html', js_api = api, width = 1000, height = 712, resizable = False) # Create GUI window
+		webview.start(debug=True)
