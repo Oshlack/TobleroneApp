@@ -166,7 +166,7 @@ function createDensityPlot(data_background, sample_value, data_thresholds, data_
         }]
     },
     yAxis: {
-      title: { text: null }
+      title: { text: "Density"  }
     },
     tooltip: {
       valueDecimals: 6
