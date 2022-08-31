@@ -582,6 +582,7 @@ if __name__ == '__main__':
 			print(extract_result)
 	else:
 		api = Api()
+		catalog = api.readCatalogue() # Load catalogue
 		config['Dynamic'] = api.readConfigurationFile() # Load dynamic configuration
 		window = webview.create_window('Toblerone', 'assets/gui.html', js_api = api, width = 1000, height = 712, resizable = False) # Create GUI window
 		webview.start(debug=True)
