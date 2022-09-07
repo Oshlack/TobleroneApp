@@ -130,8 +130,13 @@ function createBoxplot(dataBackground, dataSample, deletion_id) {
 	var boxValues = getBoxValues(backgroundValues, backgroundCounts);
 	boxData.push(boxValues.ScaledProportion);
 	meanData.push([0, mean(backgroundValues)]);
-
     sample_value = dataSample.ScaledProportion
+
+
+//Work out max proportion from sample and background for limit 
+      const max_s_back = Math.max(...all_values)
+      const max_s_plot = Math.max(max_s_back,sample_value)
+      const max_f_plot = Math.max(max_s_plot, 1.5)
 
 		Highcharts.chart('plot_box', {
 		chart: {
@@ -156,11 +161,11 @@ function createBoxplot(dataBackground, dataSample, deletion_id) {
 		},
 		yAxis: {
 			title: {
-				text: 'Value'
+				text: 'ScaledPropotion'
 			},
       type: 'logarithmic',
       min: 0.0001,
-      max: 1.5,
+      max: max_f_plot,
 			plotLines: [
         {
           value: 0.001,
@@ -215,7 +220,7 @@ function createBoxplot(dataBackground, dataSample, deletion_id) {
 						lineColor: '#112591'
 				},
 				tooltip: {
-						pointFormat: 'Value: {point.y}'
+						pointFormat: 'ScaledProportion: {point.y}'
 				}
 			}
 		],

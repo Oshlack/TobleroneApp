@@ -412,6 +412,22 @@ function createRidgelineDensityPlot(background_csv, tinyt_csv, thresholds_csv) {
     })
   });
 
+
+    //Work out max Z-score value from background and sa,ple
+    //sampleDataArray_zscore.forEach((zscore, i)
+    //data.results.forEach((e, i) => {
+//console.log(dataArray_zscore)
+      const max_z_back = Math.max(...sampleDataArray_zscore.map((zscore, i) => zscore))
+      //const max_z_sample = Math.max(...dataArray_zscore)
+      const max_z_sample = Math.max(...dataArray_zscore.map(this_array => Math.max(...this_array)))
+
+
+      const max_z_plot = Math.max(max_z_back,max_z_sample)+1
+
+    console.log(max_z_back)
+    console.log(max_z_sample)
+    console.log(max_z_plot)
+
     Highcharts.chart("plot_ridgeline_density", {
       chart: {
         type: "areasplinerange",
@@ -429,7 +445,8 @@ function createRidgelineDensityPlot(background_csv, tinyt_csv, thresholds_csv) {
       xAxis: {
         title: { text: "Z-score" },
         labels: { format: "{value}" },
-        tickInterval: 1
+        tickInterval: 1,
+        max: max_z_plot
       },
       yAxis: {
         title: { text: null },

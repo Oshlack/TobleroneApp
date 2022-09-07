@@ -130,7 +130,7 @@ function showDataOnSummaryTab() {
 
 	let del_data_for_summary = sample_threshold_data_del4_5_6_7 // Assign the del4-7 data to show in summary tab.
 	let outliers_total = zscores_all_dels.filter(x => x >= 3).length // Count how many has Zscore >= 3
-	let summary_text_w_values_text = `The ${del_data_for_summary.Gene} ${del_data_for_summary.Deletion} was ${del_data_for_summary.Label} (shown on left). There were ${outliers_total} outliers in other IKZF1 deletions (on the right). See Deletions for more details.` // Create the text
+	let summary_text_w_values_text = `The ${del_data_for_summary.Gene} ${del_data_for_summary.Deletion} was ${del_data_for_summary.Label} (shown on left). There were ${outliers_total} total outliers in IKZF1 deletions (on the right). See Deletions for more details.` // Create the text
 	$('#summary_text_w_values').html(summary_text_w_values_text) // Push it to the HTML
 
 	let thresholdLabel = sample_threshold_data_del4_5_6_7.Label
