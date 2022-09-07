@@ -23,13 +23,13 @@ jobs:
            pip install -r requirements.txt
    
       - name: Download latest macos binary
-        run: curl https://github.com/Oshlack/Toblerone/releases/latest/download/tinyt_macos -o bin/osx/tinyt_macos
+        run: curl -L  https://github.com/Oshlack/Toblerone/releases/latest/download/tinyt_macos -o bin/osx/tinyt_macos
       
       - name: Download latest exe binary
-        run: curl https://github.com/Oshlack/Toblerone/releases/latest/download/tinyt.exe -o bin/win/tinyt.exe 
+        run: curl -L https://github.com/Oshlack/Toblerone/releases/latest/download/tinyt.exe -o bin/win/tinyt.exe 
       
       - name: Download latest linux binary
-        run: curl https://github.com/Oshlack/Toblerone/releases/latest/download/tinyt_amd64 -o bin/linux/tinyt_amd64
+        run: curl -L https://github.com/Oshlack/Toblerone/releases/latest/download/tinyt_amd64 -o bin/linux/tinyt_amd64
 
 
       - name: Build
@@ -72,13 +72,13 @@ jobs:
            pip install -r requirements.txt
       
       - name: Download latest macos binary
-        run: curl https://github.com/Oshlack/Toblerone/releases/latest/download/tinyt_macos -o bin/osx/tinyt_macos
+        run: curl -L https://github.com/Oshlack/Toblerone/releases/latest/download/tinyt_macos -o bin/osx/tinyt_macos
       
       - name: Download latest exe binary
-        run: curl https://github.com/Oshlack/Toblerone/releases/latest/download/tinyt.exe -o bin/win/tinyt.exe 
+        run: curl -L https://github.com/Oshlack/Toblerone/releases/latest/download/tinyt.exe -o bin/win/tinyt.exe 
       
       - name: Download latest linux binary
-        run: curl https://github.com/Oshlack/Toblerone/releases/latest/download/tinyt_amd64 -o bin/linux/tinyt_amd64
+        run: curl -L  https://github.com/Oshlack/Toblerone/releases/latest/download/tinyt_amd64 -o bin/linux/tinyt_amd64
       
       - name: Build for mac
         run: python3 create_macos.py py2app && chmod +x ./dist/Toblerone.app 
