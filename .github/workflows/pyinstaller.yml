@@ -20,7 +20,7 @@ jobs:
               architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
       - name: Install dependencies
         run: |
-           yum install gtk3-devel
+           yum -y install gtk3-devel
            python -m pip install --upgrade pip
            pip install -r requirements.txt
    
