@@ -20,8 +20,7 @@ jobs:
               architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
       - name: Install dependencies
         run: |
-           apt update
-           apt install  gir1.2-gtk-3.0 
+           yum install gtk3-devel
            python -m pip install --upgrade pip
            pip install -r requirements.txt
    
