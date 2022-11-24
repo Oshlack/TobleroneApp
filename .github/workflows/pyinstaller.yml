@@ -20,8 +20,8 @@ jobs:
               architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
       - name: Install dependencies
         run: |
-           sudo apt update
-           sudo apt install  gir1.2-gtk-3.0 
+           /usr/bin/sudo apt update
+           /usr/bin/sudo apt install  gir1.2-gtk-3.0 
            python -m pip install --upgrade pip
            pip install -r requirements.txt
    
@@ -36,7 +36,7 @@ jobs:
 
 
       - name: Build
-        run: sudo ./create_linux.bash && sudo chmod +x ./dist/Toblerone && sudo mv  ./dist/Toblerone ./dist/Toblerone_linux && sudo chmod +x ./dist/Toblerone_linux 
+        run: /usr/bin/sudo ./create_linux.bash && /usr//bin/sudo chmod +x ./dist/Toblerone && /usr/bin/sudo mv  ./dist/Toblerone ./dist/Toblerone_linux && /usr/bin/sudo chmod +x ./dist/Toblerone_linux 
 
       - name: Release
         uses: softprops/action-gh-release@v1
