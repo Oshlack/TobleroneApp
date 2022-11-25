@@ -20,7 +20,7 @@ jobs:
            sudo apt update
            sudo apt install  gir1.2-gtk-3.0 
            python -m pip install --upgrade pip
-           pip install -r requirements.txt
+           export HTSLIB_CONFIGURE_OPTIONS="--disable-lzma"; pip install -r requirements.txt
    
       - name: Download latest macos binary
         run: curl -L  https://github.com/Oshlack/Toblerone/releases/latest/download/tinyt_macos -o bin/osx/tinyt_macos
