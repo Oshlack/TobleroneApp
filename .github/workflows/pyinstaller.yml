@@ -58,7 +58,7 @@ jobs:
       - name: Install xz
         run: |
           brew update
-          brew install xz
+          brew install xz liblzma-devel
 
       - name: Install create-dmg
         run: |
