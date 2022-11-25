@@ -5,11 +5,8 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
-    # Use a container with GLIBC 2.17 https://kobzol.github.io/rust/ci/2021/05/07/building-rust-binaries-in-ci-that-work-with-older-glibc.html#solution
-    container: quay.io/pypa/manylinux2014_x86_64
+
     steps:
-      - name: Show GLIBC
-        run: ldd --version
       - name: Checkout
         uses: actions/checkout@v1
 
@@ -20,7 +17,8 @@ jobs:
               architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
       - name: Install dependencies
         run: |
-           yum -y install gtk3-devel
+           sudo apt update
+           sudo apt install  gir1.2-gtk-3.0 
            python -m pip install --upgrade pip
            pip install -r requirements.txt
    
@@ -35,7 +33,7 @@ jobs:
 
 
       - name: Build
-        run: ./create_linux.bash && chmod +x ./dist/Toblerone && mv  ./dist/Toblerone ./dist/Toblerone_linux &&  chmod +x ./dist/Toblerone_linux 
+        run: sudo ./create_linux.bash && sudo chmod +x ./dist/Toblerone && sudo mv  ./dist/Toblerone ./dist/Toblerone_linux && sudo chmod +x ./dist/Toblerone_linux 
 
       - name: Release
         uses: softprops/action-gh-release@v1
