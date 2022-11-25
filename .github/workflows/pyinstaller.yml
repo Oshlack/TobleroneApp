@@ -58,7 +58,7 @@ jobs:
       - name: Install xz htslib
         run: |
           brew update
-          brew install xz htslib py33-tkinter
+          brew install xz htslib
 
       - name: Install create-dmg
         run: |
