@@ -55,6 +55,10 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: '14'
+      - name: Install xz
+        run: |
+          brew update
+          brew install xz
 
       - name: Install create-dmg
         run: |
