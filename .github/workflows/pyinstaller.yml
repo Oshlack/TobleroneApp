@@ -55,10 +55,10 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: '14'
-      - name: Install xz
+      - name: Install xz htslib
         run: |
           brew update
-          brew install xz liblzma-devel
+          brew install xz htslib
 
       - name: Install create-dmg
         run: |
